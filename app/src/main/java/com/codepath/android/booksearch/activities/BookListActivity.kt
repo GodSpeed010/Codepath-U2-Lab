@@ -1,5 +1,6 @@
 package com.codepath.android.booksearch.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -7,6 +8,8 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.MenuItemCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -37,15 +40,18 @@ class BookListActivity : AppCompatActivity() {
         // Checkpoint #3
         // Switch Activity to Use a Toolbar
         // see http://guides.codepath.org/android/Using-the-App-ToolBar#using-toolbar-as-actionbar
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
 
         // Initialize the adapter
         bookAdapter = BookAdapter(this, booksList)
-        bookAdapter.setOnItemClickListener (object : OnItemClickListener {
+        bookAdapter.setOnItemClickListener(object : OnItemClickListener {
             override fun onItemClick(itemView: View?, position: Int) {
                 Toast.makeText(
                     this@BookListActivity,
                     "An item at position $position clicked!",
-                    Toast.LENGTH_SHORT).show()
+                    Toast.LENGTH_SHORT
+                ).show()
 
                 // Handle item click here:
                 // Checkpoint #5
@@ -57,6 +63,9 @@ class BookListActivity : AppCompatActivity() {
                 // Pass the book into details activity using extras
                 // see http://guides.codepath.org/android/Using-Intents-to-Create-Flows
                 // see kotlin-parcelize https://developer.android.com/kotlin/parcelize plugin to do this
+                val i = Intent(this@BookListActivity, BookDetailActivity::class.java)
+                i.putExtra("book", booksList[position])
+                startActivity(i)
             }
         })
         // Attach the adapter to the RecyclerView
@@ -64,9 +73,6 @@ class BookListActivity : AppCompatActivity() {
 
         // Set layout manager to position the items
         rvBooks.layoutManager = LinearLayoutManager(this)
-
-        // Fetch the data remotely
-        fetchBooks("Oscar Wilde")
     }
 
     // Executes an API call to the OpenLibrary search endpoint, parses the results
@@ -93,10 +99,17 @@ class BookListActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onFailure(statusCode: Int, headers: Headers, responseString: String, throwable: Throwable) {
+            override fun onFailure(
+                statusCode: Int,
+                headers: Headers,
+                responseString: String,
+                throwable: Throwable
+            ) {
                 // Handle failed request here
-                Log.e(BookListActivity::class.java.simpleName,
-                    "Request failed with code $statusCode. Response message: $responseString")
+                Log.e(
+                    BookListActivity::class.java.simpleName,
+                    "Request failed with code $statusCode. Response message: $responseString"
+                )
             }
         })
     }
@@ -107,7 +120,24 @@ class BookListActivity : AppCompatActivity() {
         // Checkpoint #4
         // Add SearchView to Toolbar
         // Refer to http://guides.codepath.org/android/Extended-ActionBar-Guide#adding-searchview-to-actionbar guide for more details
+        val searchItem: MenuItem = menu.findItem(R.id.action_search)
+        val searchView = MenuItemCompat.getActionView(searchItem) as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                searchView.clearFocus()
 
+                // Fetch the data remotely
+                query?.let { fetchBooks(it) }
+
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return false
+            }
+
+        }
+        )
 
         // Checkpoint #7 Show Progress Bar
         // see https://guides.codepath.org/android/Handling-ProgressBars#progress-within-actionbar

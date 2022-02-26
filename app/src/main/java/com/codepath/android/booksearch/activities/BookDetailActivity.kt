@@ -1,5 +1,6 @@
 package com.codepath.android.booksearch.activities
 
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.TextView
 import android.os.Bundle
@@ -7,9 +8,12 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.codepath.android.booksearch.R
 import com.codepath.android.booksearch.R.id
 import com.codepath.android.booksearch.R.layout
+import com.codepath.android.booksearch.models.Book
 
 class BookDetailActivity : AppCompatActivity() {
     private var ivBookCover: ImageView? = null
@@ -24,8 +28,20 @@ class BookDetailActivity : AppCompatActivity() {
         tvAuthor = findViewById<View>(id.tvAuthor) as TextView
 
         // Extract book object from intent extras
+        val book: Book? = intent.getParcelableExtra("book")
 
         // Use book object to populate data into views
+
+        Glide.with(this)
+            .load(Uri.parse(book?.coverUrl))
+            .apply(
+                RequestOptions()
+                    .placeholder(R.drawable.ic_nocover)
+            )
+            .into(ivBookCover!!)
+        tvTitle?.text = book?.title
+        tvAuthor?.text = book?.author
+
         // Checkpoint #5
         // Reuse the Toolbar previously used in the detailed activity by referring to this guide
         // Follow using a Toolbar guide to set the Toolbar as the ActionBar.

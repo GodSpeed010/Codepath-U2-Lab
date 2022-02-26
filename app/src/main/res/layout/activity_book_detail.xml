@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:gravity="center_horizontal"
     tools:context=".activities.BookDetailActivity">
 
     <ImageView
@@ -18,7 +19,9 @@
         android:textSize="32sp"
         android:layout_marginTop="8dp"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp" />
+        android:paddingRight="10dp"
+        android:textStyle="bold"
+        />
 
     <TextView
         android:id="@+id/tvAuthor"
